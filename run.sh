@@ -9,12 +9,12 @@ function error() {
 }
 
 # Check that we have the right number of arguments.
-[[ $# -lt 2 ]] && error "${RED}-- Incorrect argument count.${NORM}"
+[[ $# -lt 1 ]] && error "${RED}-- Incorrect argument count.${NORM}"
 COMMAND=$1
 shift
 
 # Project directory variables.
-PROJECT_ROOT_DIR="${HOME}/smoothstack/boss/$1"
+PROJECT_ROOT_DIR="${HOME}/smoothstack/boss/cpp-server"
 PROJECT_SRC_DIR="${PROJECT_ROOT_DIR}/source"
 PROJECT_BUILD_DIR="${PROJECT_ROOT_DIR}/build"
 
@@ -34,12 +34,18 @@ PODMAN_CMD="podman run ${PODMAN_OPT} ${PODMAN_VOLUMES} cpp-server-devel-containe
 
 function container_build() {
 	echo -e "${GREEN}-- Building devel container...${NORM}"
-	podman build --file devel --tag cpp-server-devel-container ${HOME}/smoothstack/boss/cpp-server/docker/
+	podman build --tag cpp-server-devel-container --target development ${PROJECT_ROOT_DIR}
 }
 
 function container_interact() {
 	echo -e "${GREEN}-- Opening container in interactive mode...${NORM}"
 	podman run ${PODMAN_OPT} -it ${PODMAN_VOLUMES} cpp-server-devel-container
+}
+
+function container_deploy() {
+	# TODO: Get tag name from git tag for release version.
+	echo -e "${GREEN}-- Building prod container...${NORM}"
+	podman build --tag boss-cpp-server --target production ${PROJECT_ROOT_DIR}
 }
 
 function conan_prepare() {
@@ -65,6 +71,10 @@ function conan_build() {
 	${PODMAN_CMD} conan build --build-folder ${MICROSERVICE_BUILD_DIR} ${MICROSERVICE_ROOT_DIR}
 }
 
+function conan_package() {
+	${PODMAN_CMD} conan package --build-folder ${MICROSERVICE_BUILD_DIR} ${MICROSERVICE_ROOT_DIR}
+}
+
 function conan_clean() {
 	podman run ${PODMAN_OPT} ${PODMAN_VOLUMES} --workdir ${MICROSERVICE_BUILD_DIR} cpp-server-devel-container \
 		make clean
@@ -79,9 +89,11 @@ function clean_all() {
 
 case ${COMMAND} in
 	"interactive") container_interact;;
+	"deploy") container_deploy;;
 	"prepare") conan_prepare;;
 	"install") conan_install;;
 	"build") conan_build;;
+	"package") conan_package;;
 	"clean") conan_clean;;
 	"purge") clean_all;;
 esac
