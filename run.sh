@@ -55,15 +55,18 @@ function conan_prepare() {
 		${PODMAN_CMD} conan profile update settings.compiler=clang default
 		${PODMAN_CMD} conan profile update settings.compiler.version=12 default
 		${PODMAN_CMD} conan profile update settings.compiler.libcxx=libstdc++11 default
+		${PODMAN_CMD} conan profile update env.CC=/usr/bin/clang default
+		${PODMAN_CMD} conan profile update env.CXX=/usr/bin/clang++ default
+		${PODMAN_CMD} conan profile update env.CONAN_CPU_COUNT=6 default
 	)
 }
 
 function conan_install() {
 	conan_prepare
-	! [[ -d "${PROJECT_BUILD_DIR}" ]] && (
-		mkdir -p ${PROJECT_BUILD_DIR}
-		${PODMAN_CMD} conan install --install-folder ${MICROSERVICE_BUILD_DIR} ${MICROSERVICE_ROOT_DIR}
-	)
+	${PODMAN_CMD} conan install --build missing --install-folder ${MICROSERVICE_BUILD_DIR} ${MICROSERVICE_ROOT_DIR}
+	# ! [[ -d "${PROJECT_BUILD_DIR}" ]] && (
+	# 	mkdir -p ${PROJECT_BUILD_DIR}
+	# )
 }
 
 function conan_build() {
