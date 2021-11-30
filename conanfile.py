@@ -7,9 +7,9 @@ class BossCppServerConan(ConanFile):
 	author = "John Christman john.christman@smoothstack.com"
 	url = "https://github.com/SSOrphans/boss/cpp-server"
 	description = "C++ based HTTP server proof of concept for SWIFT and Crabel position."
-	settings = "os", "compiler", "build_type", "arch"
+	settings = "cppstd", "os", "compiler", "build_type", "arch"
 	options = {}
-	default_options = {}
+	default_options = "spdlog:header_only=True"
 	requires = [
 		"openssl/3.0.0",
 		"boost/1.77.0",

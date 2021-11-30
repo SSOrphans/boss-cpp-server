@@ -1,38 +1,77 @@
-#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
-#include <boost/json.hpp>
+#include <thread>
+#include <type_traits>
 
-namespace json = boost::json;
-namespace fs = std::filesystem;
+#include "listener.hpp"
+#include "server_config.hpp"
 
-int main(int argc, char** argv)
-{
-	fs::path configFile { argv[0] };
+namespace ssor::boss {
+void init_logging() {
+  using namespace boost::log;
+  using namespace boost::log::trivial;
 
-	// Escape bin directory and enter the etc directory.
-	configFile = configFile.parent_path().parent_path();
-	configFile.append("etc/server-config.json");
+  static const auto COMMON_FMT{"[%TimeStamp%][%Severity%]: %Message%"};
+  register_simple_formatter_factory<severity_level, char>("Severity");
+  add_console_log(std::cout, keywords::format = COMMON_FMT,
+                  keywords::auto_flush = true);
+  add_common_attributes();
 
-	// Check file's existence.
-	if (!fs::exists(configFile))
-	{
-		std::cerr << "No configuration file to load.\n";
-		return EXIT_FAILURE;
-	}
+#ifdef _DEBUG
+  core::get()->set_filter(severity >= trace);
+#else
+  core::get()->set_filter(severity >= warning);
+#endif
+}
 
-	// Read configuration file.
-	std::ifstream file { configFile };
-	std::string contents {
-		std::istreambuf_iterator<char>(file),
-		std::istreambuf_iterator<char>()
-	};
+server_config load_config_file(const fs::path& path) {
+  BOOST_LOG_TRIVIAL(info) << "Config file at path '" << path.c_str()
+                          << "' loaded";
 
-	// Convert contents to parsed JSON value.
-	json::error_code ec;
-	json::value jv { json::parse(contents), ec };
+  // Read configuration file.
+  std::ifstream file{path};
+  json::value value{json::parse(std::string{
+      std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()})};
 
-	std::cout << configFile << std::endl;
-	return EXIT_SUCCESS;
+  // Convert contents to parsed JSON value.
+  return ssor::boss::server_config{json::value_to<server_config>(value)};
+}
+}  // namespace ssor::boss
+
+void init_logging();
+int main(int argc, char** argv) {
+  ssor::boss::init_logging();
+
+  // Escape bin directory and enter the etc directory.
+  fs::path configFile{argv[0]};
+  configFile = configFile.parent_path().parent_path();
+  configFile.append("etc/server-config.json");
+
+  // Check file's existence.
+  ssor::boss::server_config config{"0.0.0.0", 8080, 2};
+  if (!fs::exists(configFile))
+    BOOST_LOG_TRIVIAL(warning)
+        << "No configuration file found, loading default configuration";
+  else
+    config = ssor::boss::load_config_file(configFile);
+
+  BOOST_LOG_TRIVIAL(info) << "Server Config " << config.to_string();
+  BOOST_LOG_TRIVIAL(info) << "Starting HTTP server...";
+
+  net::io_context ioc{config.threads};
+  tls::context ctx{tls::context::tlsv12};
+  std::uint16_t https_port{config.port};
+
+  net::ip::address addr{net::ip::make_address(config.address)};
+  net::ip::tcp::endpoint https{addr, https_port};
+  auto listener = std::make_shared<ssor::boss::listener>(ioc, ctx, https);
+  listener->run();
+
+  for (auto index = config.threads - 1; index > 0; --index)
+    std::thread([&ioc] { ioc.run(); }).detach();
+  ioc.run();
+
+  return EXIT_SUCCESS;
 }

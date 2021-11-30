@@ -1,4 +1,6 @@
 /.conan
 /build
 
+.lldb
 .bash_history
+
