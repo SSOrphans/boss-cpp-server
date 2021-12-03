@@ -1,4 +1,4 @@
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp book.grpc.pb.cc book.pb.cc)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE _DEBUG)
@@ -11,13 +11,12 @@ target_compile_definitions(
 )
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE predef.hpp)
+
+# Link all required interface libraries.
 target_link_libraries(
 	${PROJECT_NAME}
-	PRIVATE Boost::filesystem
-	PRIVATE Boost::json
-	PRIVATE Boost::log
-	PRIVATE Boost::log_setup
+	PRIVATE Boost::Boost
+	PRIVATE gRPC::gRPC
 	PRIVATE LibXml2::LibXml2
-	PRIVATE OpenSSL::SSL
-	PRIVATE OpenSSL::Crypto
+	PRIVATE OpenSSL::OpenSSL
 )

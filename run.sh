@@ -39,7 +39,6 @@ MICROSERVICE_BUILD_DIR="${MICROSERVICE_ROOT_DIR}/build"
 
 # Describe volume mounts.
 PROJECT_VOLUME="${PROJECT_ROOT_DIR}:${MICROSERVICE_ROOT_DIR}"
-print_info "Mounting ${PROJECT_VOLUME}"
 
 # Podman setup.
 PODMAN_OPT="--security-opt label=disable --rm"
@@ -64,6 +63,7 @@ function container_build() {
 
 function container_interact() {
 	print_info "Opening container in interactive mode..."
+	print_info "Mounting ${PROJECT_VOLUME}"
 	podman run --privileged --rm -it ${PODMAN_VOLUMES} cpp-server-devel-container
 }
 
@@ -117,6 +117,7 @@ function conan_build() {
 
 function conan_package() {
 	check_profile_argument $1 package
+	conan_build $@
 	${PODMAN_CMD} conan package --build-folder "${MICROSERVICE_BUILD_DIR}/$1" ${MICROSERVICE_ROOT_DIR}
 }
 
@@ -129,10 +130,24 @@ function clean_all() {
 	rm -rf ${PROJECT_BUILD_DIR}
 }
 
+function gen_protos() {
+	${PODMAN_CMD} protoc \
+		-I protos \
+		--grpc_out=${MICROSERVICE_SRC_DIR} \
+		--plugin=protoc-gen-grpc=`${PODMAN_CMD} which grpc_cpp_plugin` \
+		protos/*
+
+	${PODMAN_CMD} protoc \
+		-I protos \
+		--cpp_out=${MICROSERVICE_SRC_DIR} \
+		protos/*
+}
+
 # Check for container and build if necessary.
 ! podman image exists cpp-server-devel-container:latest && container_build
 
 case ${COMMAND} in
+	"build_container") container_build;;
 	"interactive") container_interact;;
 	"deploy") container_deploy;;
 	"prepare") conan_prepare;;
@@ -141,4 +156,5 @@ case ${COMMAND} in
 	"package") conan_package $@;;
 	"clean") conan_clean;;
 	"purge") clean_all;;
+	"gen_protos") gen_protos;;
 esac

@@ -11,6 +11,7 @@
 #include <boost/config.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/json.hpp>
+#include <grpcpp/grpcpp.h>
 
 namespace fs = boost::filesystem;
 namespace beast = boost::beast;

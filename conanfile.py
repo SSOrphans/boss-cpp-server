@@ -1,6 +1,5 @@
 from conans import ConanFile, CMake, tools
 
-
 class BossCppServerConan(ConanFile):
 	name = "BossCppServer"
 	version = "0.0.1"
@@ -9,12 +8,17 @@ class BossCppServerConan(ConanFile):
 	description = "C++ based HTTP server proof of concept for SWIFT and Crabel position."
 	settings = "cppstd", "os", "compiler", "build_type", "arch"
 	options = {}
-	default_options = "spdlog:header_only=True"
+	default_options = {
+		"spdlog:header_only": True,
+		"libnghttp2:with_asio": True
+	}
 	requires = [
-		"openssl/3.0.0",
 		"boost/1.77.0",
+		"gtest/1.11.0",
+		"grpc/1.39.1",
 		"libxml2/2.9.12",
-		"gtest/1.11.0"
+		"protobuf/3.17.1",
+		"openssl/3.0.0"
 	]
 	generators = "cmake_find_package"
 

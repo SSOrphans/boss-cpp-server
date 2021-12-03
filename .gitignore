@@ -1,6 +1,9 @@
+# Folder ignores
 /.conan
+/.lldb
 /build
 
-.lldb
-.bash_history
-
+# File ignores
+*.swp
+*.bash_history
+*.vim

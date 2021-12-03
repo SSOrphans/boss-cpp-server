@@ -5,8 +5,7 @@
 #include <thread>
 #include <type_traits>
 
-#include "listener.hpp"
-#include "server_config.hpp"
+#include "server.hpp"
 
 namespace ssor::boss {
 void init_logging() {
@@ -40,9 +39,8 @@ server_config load_config_file(const fs::path& path) {
 }
 }  // namespace ssor::boss
 
-void init_logging();
 int main(int argc, char** argv) {
-  ssor::boss::init_logging();
+	ssor::boss::init_logging();
 
   // Escape bin directory and enter the etc directory.
   fs::path configFile{argv[0]};
@@ -50,28 +48,31 @@ int main(int argc, char** argv) {
   configFile.append("etc/server-config.json");
 
   // Check file's existence.
-  ssor::boss::server_config config{"0.0.0.0", 8080, 2};
+  ssor::boss::server_config config{"localhost", 8080, 2};
   if (!fs::exists(configFile))
     BOOST_LOG_TRIVIAL(warning)
         << "No configuration file found, loading default configuration";
   else
     config = ssor::boss::load_config_file(configFile);
 
-  BOOST_LOG_TRIVIAL(info) << "Server Config " << config.to_string();
+ 	BOOST_LOG_TRIVIAL(info) << "Server Config " << config.to_string();
   BOOST_LOG_TRIVIAL(info) << "Starting HTTP server...";
 
-  net::io_context ioc{config.threads};
-  tls::context ctx{tls::context::tlsv12};
-  std::uint16_t https_port{config.port};
+  //net::io_context ioc{config.threads};
+  //tls::context ctx{tls::context::tlsv12};
+  //std::uint16_t https_port{config.port};
 
-  net::ip::address addr{net::ip::make_address(config.address)};
-  net::ip::tcp::endpoint https{addr, https_port};
-  auto listener = std::make_shared<ssor::boss::listener>(ioc, ctx, https);
-  listener->run();
+  //net::ip::address addr{net::ip::make_address(config.address)};
+  //net::ip::tcp::endpoint https{addr, https_port};
+  //auto listener = std::make_shared<ssor::boss::listener>(ioc, ctx, https);
+  //listener->run();
 
-  for (auto index = config.threads - 1; index > 0; --index)
-    std::thread([&ioc] { ioc.run(); }).detach();
-  ioc.run();
+  //for (auto index = config.threads - 1; index > 0; --index)
+  //  std::thread([&ioc] { ioc.run(); }).detach();
+  //ioc.run();
 
-  return EXIT_SUCCESS;
+	ssor::boss::server srvr{ config };
+	srvr.run();
+
+	return EXIT_SUCCESS;
 }

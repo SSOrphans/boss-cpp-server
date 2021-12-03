@@ -9,9 +9,12 @@
 	"C_Cpp.default.includePath": [
 		"${default}",
 		"${workspaceFolder}/source",
+		"${workspaceFolder}/.conan/data/abseil/20210324.2/_/_/package/2f5e1942094371586c783746b27e858278020ee5/include",
 		"${workspaceFolder}/.conan/data/boost/1.77.0/_/_/package/110896332970d5a0a0bca697e73d7782d505075e/include",
+		"${workspaceFolder}/.conan/data/grpc/1.39.1/_/_/package/1166c47e93608ab9ed1c0aa159b82c8fdb86000e/include",
 		"${workspaceFolder}/.conan/data/libxml2/2.9.12/_/_/package/96a8f4d1c2a9166f6cf2f7d7496800ba41b8f84d/include",
 		"${workspaceFolder}/.conan/data/libxml2/2.9.12/_/_/package/96a8f4d1c2a9166f6cf2f7d7496800ba41b8f84d/include/libxml2",
+		"${workspaceFolder}/.conan/data/protobuf/3.17.1/_/_/package/8b7c9763c797cff35375f939b7f2d125dc808549/include",
 		"${workspaceFolder}/.conan/data/openssl/3.0.0/_/_/package/b48f33ba0254684d254b836f89cbd030a15e3b5f/include"
 	],
 	"cmake.configureOnEdit": false,
