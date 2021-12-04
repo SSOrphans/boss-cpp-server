@@ -12,6 +12,19 @@ function run_server_application {
 	${PODMAN_RUN_PROD} ${MICROSERVICE_ROOT_DIR}/cppserver
 }
 
+function display_commands {
+	print_norm "Available Commands:"
+	echo -e " + ${MAGENTA}interactive${NORM} - Opens development container in interactive mode"
+	echo -e " + ${MAGENTA}fetch${NORM}       - Fetches Conan dependencies and builds them"
+	echo -e " + ${MAGENTA}build${NORM}       - Builds the server application"
+	echo -e " + ${MAGENTA}pack${NORM}        - Packages the server application"
+	echo -e " + ${MAGENTA}clean${NORM}       - Cleans the server application build using 'make clean'"
+	echo -e " + ${MAGENTA}purge${NORM}       - Erases the server application build"
+	echo -e " + ${MAGENTA}reset${NORM}       - Erases the Conan cache and builds"
+	echo -e " + ${MAGENTA}local${NORM}       - Runs the application locally"
+	echo -e " + ${MAGENTA}server${NORM}      - Runs the application in its production environment\n"
+}
+
 COMMAND=$1
 shift
 
@@ -26,6 +39,7 @@ case ${COMMAND} in
 	"conan_prepare") conan_prepare;;
 
 	# Common commands.
+	"help") display_commands;;
 	"interactive") interact_container;;
 	"fetch") conan_fetch $@;;
 	"build") conan_build $@;;

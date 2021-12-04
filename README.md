@@ -1,6 +1,6 @@
 # C++ Server using gRPC over HTTP/2
 
-This project provides an implementation of a simple Book api that is accessed via gRPC over HTTP/2.
+This project provides an implementation of a simple Book API that is accessed via gRPC over HTTP/2.
 It has been dockerized so that it can run in an environment that it expects and can be isolated in
 for it's own purposes. This proves useful in a cloud environment or standalone.
 
