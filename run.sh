@@ -37,6 +37,7 @@ case ${COMMAND} in
 	"build_container") build_container;;
 	"clean_container") clean_container;;
 	"conan_prepare") conan_prepare;;
+	"generate_protos") generate_protos;;
 
 	# Common commands.
 	"help") display_commands;;
