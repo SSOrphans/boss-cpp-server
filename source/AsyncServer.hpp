@@ -1,16 +1,16 @@
 #pragma once
 #include "predef.hpp"
-#include "server_config.hpp"
-#include "book.grpc.pb.h"
+#include "ServerConfig.hpp"
+#include "Book.grpc.pb.h"
 
 namespace ssor::boss {
 
-struct server final {
-	server(const server_config& config)
+struct AsyncServer final {
+	AsyncServer(const ServerConfig& config)
 		: m_config{ config }
 	{ }
 
-	~server() {
+	~AsyncServer() {
 		m_server->Shutdown();
 		m_queue->Shutdown();
 	}
@@ -37,16 +37,16 @@ private:
 		virtual void proceed() = 0;
 
 	protected:
-		call_data(book_service::AsyncService* service, grpc::ServerCompletionQueue* queue)
+		call_data(BookService::AsyncService* service, grpc::ServerCompletionQueue* queue)
 			: m_service{ service }
 			, m_queue{ queue }
 			, m_status{ call_status::create }
 		{
-			book book1;
+			Book book1;
 			book1.set_name("Moby-Dick");
 			book1.set_author("Herman Melville");
 
-			book book2;
+			Book book2;
 			book2.set_name("Jane Eyre");
 			book2.set_author("Charlotte Brontë");
 
@@ -60,15 +60,15 @@ private:
 		};
 
 	protected:
-		std::vector<book> m_books;
+		std::vector<Book> m_books;
 		grpc::ServerContext m_context;
-		book_service::AsyncService* m_service;
+		BookService::AsyncService* m_service;
 		grpc::ServerCompletionQueue* m_queue;
 		call_status m_status;
 	};
 
 	struct get_book_call_data : public call_data {
-		get_book_call_data(book_service::AsyncService* service, grpc::ServerCompletionQueue* queue)
+		get_book_call_data(BookService::AsyncService* service, grpc::ServerCompletionQueue* queue)
 			: call_data(service, queue)
 			, m_responder{ &m_context }
 		{ }
@@ -76,7 +76,7 @@ private:
 		void proceed() override {
 			if (m_status == call_status::create) {
 				m_status = call_status::process;
-				m_service->Requestget_book(&m_context, &m_request, &m_responder, m_queue, m_queue, this);
+				m_service->RequestGetBook(&m_context, &m_request, &m_responder, m_queue, m_queue, this);
 			} else if (m_status == call_status::process) {
 				// spawn new one for other requests.
 				(new get_book_call_data(m_service, m_queue))->proceed();
@@ -91,12 +91,12 @@ private:
 		}
 
 	private:
-		grpc::ServerAsyncResponseWriter<book> m_responder;
+		grpc::ServerAsyncResponseWriter<Book> m_responder;
 		google::protobuf::UInt32Value m_request;
 	};
 
 	struct list_books_call_data : public call_data {
-		list_books_call_data(book_service::AsyncService* service, grpc::ServerCompletionQueue* queue)
+		list_books_call_data(BookService::AsyncService* service, grpc::ServerCompletionQueue* queue)
 			: call_data(service, queue)
 			, m_responder{ &m_context }
 		{ }
@@ -104,7 +104,7 @@ private:
 		void proceed() override {
 			if (m_status == call_status::create) {
 				m_status = call_status::process;
-				m_service->Requestlist_books(&m_context, &m_request, &m_responder, m_queue, m_queue, this);
+				m_service->RequestListBooks(&m_context, &m_request, &m_responder, m_queue, m_queue, this);
 			} else if (m_status == call_status::process) {
 				// spawn new one for other requests.
 				(new list_books_call_data(m_service, m_queue))->proceed();
@@ -118,7 +118,7 @@ private:
 		}
 
 	private:
-		grpc::ServerAsyncWriter<book> m_responder;
+		grpc::ServerAsyncWriter<Book> m_responder;
 		google::protobuf::Empty m_request;
 	};
 
@@ -137,8 +137,8 @@ private:
 	}
 
 private:
-	server_config m_config;
-	book_service::AsyncService m_service;
+	ServerConfig m_config;
+	BookService::AsyncService m_service;
 	std::unique_ptr<grpc::Server> m_server;
 	std::unique_ptr<grpc::ServerCompletionQueue> m_queue;
 };

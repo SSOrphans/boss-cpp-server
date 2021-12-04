@@ -8,7 +8,7 @@ namespace ssor::boss {
 /**
  * @brief Contains the configuration settings for the server.
  */
-struct server_config {
+struct ServerConfig {
   // Rule of 0.
   std::string address;
   std::uint16_t port;
@@ -29,17 +29,17 @@ struct server_config {
 };
 
 inline void tag_invoke(json::value_from_tag, json::value& jv,
-                       const server_config& config) {
+                       const ServerConfig& config) {
   jv = {{"address", config.address},
         {"port", config.port},
         {"threads", config.threads}};
 }
 
-inline server_config tag_invoke(json::value_to_tag<server_config>,
+inline ServerConfig tag_invoke(json::value_to_tag<ServerConfig>,
                                 const json::value& jv) {
   const auto& obj = jv.as_object();
-  return server_config{json::value_to<std::string>(obj.at("address")),
-                       json::value_to<std::uint16_t>(obj.at("port")),
-                       json::value_to<std::int32_t>(obj.at("threads"))};
+  return ServerConfig{json::value_to<std::string>(obj.at("address")),
+                      json::value_to<std::uint16_t>(obj.at("port")),
+                      json::value_to<std::int32_t>(obj.at("threads"))};
 }
 }  // namespace ssor::boss

@@ -1,4 +1,4 @@
-add_executable(${PROJECT_NAME} main.cpp book.grpc.pb.cc book.pb.cc)
+add_executable(${PROJECT_NAME} main.cpp Book.grpc.pb.cc Book.pb.cc)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE _DEBUG)

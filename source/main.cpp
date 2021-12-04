@@ -5,7 +5,7 @@
 #include <thread>
 #include <type_traits>
 
-#include "server.hpp"
+#include "AsyncServer.hpp"
 
 namespace ssor::boss {
 void init_logging() {
@@ -25,7 +25,7 @@ void init_logging() {
 #endif
 }
 
-server_config load_config_file(const fs::path& path) {
+ServerConfig load_config_file(const fs::path& path) {
   BOOST_LOG_TRIVIAL(info) << "Config file at path '" << path.c_str()
                           << "' loaded";
 
@@ -35,7 +35,7 @@ server_config load_config_file(const fs::path& path) {
       std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()})};
 
   // Convert contents to parsed JSON value.
-  return ssor::boss::server_config{json::value_to<server_config>(value)};
+  return ssor::boss::ServerConfig{json::value_to<ServerConfig>(value)};
 }
 }  // namespace ssor::boss
 
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
   configFile.append("etc/server-config.json");
 
   // Check file's existence.
-  ssor::boss::server_config config{"localhost", 8080, 2};
+  ssor::boss::ServerConfig config{"localhost", 8080, 2};
   if (!fs::exists(configFile))
     BOOST_LOG_TRIVIAL(warning)
         << "No configuration file found, loading default configuration";
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
   //  std::thread([&ioc] { ioc.run(); }).detach();
   //ioc.run();
 
-	ssor::boss::server srvr{ config };
+	ssor::boss::AsyncServer srvr{ config };
 	srvr.run();
 
 	return EXIT_SUCCESS;

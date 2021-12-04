@@ -88,17 +88,20 @@ function conan_package {
 
 function conan_clean_build {
 	conan_check_profile_argument "$1" clean && (
+		print_info "Cleaning $1 build..."
 		${PODMAN_RUN_DEVEL} make -C "${MICROSERVICE_BUILD_DIR}/$1" clean
 	)
 }
 
 function conan_purge_build {
 	conan_check_profile_argument "$1" purge && (
+		print_info "Purging $1 build..."
 		rm -rf "${PROJECT_BUILD_DIR}/$1"
 	)
 }
 
 function conan_reset {
+	print_warn "Resetting devenv --"
 	conan_purge_build development
 	conan_purge_build production
 	rm -rf ${PROJECT_ROOT_DIR}/.conan
