@@ -7,10 +7,11 @@ class BossCppServerConan(ConanFile):
 	url = "https://github.com/SSOrphans/boss/cpp-server"
 	description = "C++ based HTTP server proof of concept for SWIFT and Crabel position."
 	settings = "cppstd", "os", "compiler", "build_type", "arch"
-	options = {}
+	options = {
+		"use_async": [True, False]
+	}
 	default_options = {
-		"spdlog:header_only": True,
-		"libnghttp2:with_asio": True
+		"use_async": False
 	}
 	requires = [
 		"boost/1.77.0",
@@ -24,12 +25,13 @@ class BossCppServerConan(ConanFile):
 
 	def build(self):
 		cmake = CMake(self)
+		cmake.definitions["USE_ASYNC"] = self.options.use_async
 		cmake.configure()
 		cmake.build()
 
 	def package(self):
 		self.copy("*.h", dst="include", src="source")
-		self.copy("BossCppServer", dst="bin", src="source", keep_path=False)
+		self.copy("cppserver", dst="bin", src="source", keep_path=False)
 		self.copy("*.dll", dst="bin", keep_path=False)
 		self.copy("*.so", dst="lib", keep_path=False)
 		self.copy("*.dylib", dst="lib", keep_path=False)

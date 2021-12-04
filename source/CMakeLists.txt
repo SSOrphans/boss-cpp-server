@@ -4,6 +4,10 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE _DEBUG)
 endif()
 
+if (USE_ASYNC)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_ASYNC)
+endif()
+
 target_compile_definitions(
 	${PROJECT_NAME}
 	PRIVATE LIBXML_WRITER_ENABLED

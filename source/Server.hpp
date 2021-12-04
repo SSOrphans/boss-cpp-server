@@ -5,12 +5,13 @@
 
 namespace ssor::boss {
 
-struct AsyncServer final {
-	AsyncServer(const ServerConfig& config)
+#if USE_ASYNC
+struct Server final {
+	Server(const ServerConfig& config)
 		: m_config{ config }
 	{ }
 
-	~AsyncServer() {
+	~Server() {
 		m_server->Shutdown();
 		m_queue->Shutdown();
 	}
@@ -142,5 +143,55 @@ private:
 	std::unique_ptr<grpc::Server> m_server;
 	std::unique_ptr<grpc::ServerCompletionQueue> m_queue;
 };
+#else
+struct Server final : public BookService::Service {
+	explicit Server(const ServerConfig& config)
+		: m_config{ config }
+	{
+		Book book1;
+		book1.set_name("Moby-Dick");
+		book1.set_author("Herman Melville");
+
+		Book book2;
+		book2.set_name("Jane Eyre");
+		book2.set_author("Charlotte Brontë");
+
+		m_books.push_back(book1);
+		m_books.push_back(book2);
+	}
+
+	void run() {
+		std::string server_address{ m_config.address };
+		server_address += ":";
+		server_address += std::to_string(m_config.port);
+
+		grpc::ServerBuilder builder;
+		builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+		builder.RegisterService(this);
+		m_server = builder.BuildAndStart();
+
+		BOOST_LOG_TRIVIAL(trace) << "Server listening on " << server_address;
+		m_server->Wait();
+	}
+
+	grpc::Status GetBook(grpc::ServerContext*, const google::protobuf::UInt32Value*, Book* book) override {
+		const auto requested = m_books[0];
+		book->set_name(requested.name());
+		book->set_author(requested.author());
+		return grpc::Status::OK;
+	}
+
+	grpc::Status ListBooks(grpc::ServerContext*, const google::protobuf::Empty*, grpc::ServerWriter<Book>* writer) override {
+		for (const auto& b : m_books)
+			writer->Write(b);
+		return grpc::Status::OK;
+	}
+
+private:
+	ServerConfig m_config;
+	std::unique_ptr<grpc::Server> m_server;
+	std::vector<Book> m_books;
+};
+#endif // USE_ASYNC
 
 } // namespace ssor::boss

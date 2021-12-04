@@ -5,7 +5,7 @@
 #include <thread>
 #include <type_traits>
 
-#include "AsyncServer.hpp"
+#include "Server.hpp"
 
 namespace ssor::boss {
 void init_logging() {
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
   //  std::thread([&ioc] { ioc.run(); }).detach();
   //ioc.run();
 
-	ssor::boss::AsyncServer srvr{ config };
+	ssor::boss::Server srvr{ config };
 	srvr.run();
 
 	return EXIT_SUCCESS;
