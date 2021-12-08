@@ -52,8 +52,12 @@ function conan_fetch {
 
 function generate_protos {
 	print_info "Generating gRPC services..."
-	${PODMAN_RUN_DEVEL} protoc -Iprotos --grpc_out=${MICROSERVICE_SOURCE_DIR} \
+	${PODMAN_RUN_DEVEL} protoc -Iprotos --grpc_out=generate_mock_code=true:${MICROSERVICE_SOURCE_DIR} \
 		--plugin=protoc-gen-grpc=`${PODMAN_RUN_DEVEL} which grpc_cpp_plugin` protos/*
+
+	# Move mock files to to tests directory.
+	print_info "Moving mock services from '${MICROSERVICE_SOURCE_DIR}' to '${MICROSERVICE_TESTS_DIR}...'"
+	${PODMAN_RUN_DEVEL} mv "${MICROSERVICE_SOURCE_DIR}/*_mock.grpc.pb.h" "${MICROSERVICE_TESTS_DIR}"
 
 	print_info "Generating C++ messages..."
 	${PODMAN_RUN_DEVEL} protoc -Iprotos --cpp_out=${MICROSERVICE_SOURCE_DIR} protos/*

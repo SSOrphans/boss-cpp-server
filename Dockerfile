@@ -10,7 +10,8 @@ RUN pip3 install conan
 
 WORKDIR /root
 ENV PATH="/root/.conan/data/protobuf/3.17.1/_/_/package/8b7c9763c797cff35375f939b7f2d125dc808549/bin:\
-/root/.conan/data/grpc/1.39.1/_/_/package/1166c47e93608ab9ed1c0aa159b82c8fdb86000e/bin:${PATH}"
+/root/.conan/data/grpc/1.39.1/LeftRuleMatters/stable/package/48992b9c2c80b89c4d5f3001c126cb945bdd9e72/bin:\
+${PATH}"
 
 CMD [ "/bin/bash" ]
 

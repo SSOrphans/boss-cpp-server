@@ -58,19 +58,6 @@ int main(int argc, char** argv) {
  	BOOST_LOG_TRIVIAL(info) << "Server Config " << config.to_string();
   BOOST_LOG_TRIVIAL(info) << "Starting HTTP server...";
 
-  //net::io_context ioc{config.threads};
-  //tls::context ctx{tls::context::tlsv12};
-  //std::uint16_t https_port{config.port};
-
-  //net::ip::address addr{net::ip::make_address(config.address)};
-  //net::ip::tcp::endpoint https{addr, https_port};
-  //auto listener = std::make_shared<ssor::boss::listener>(ioc, ctx, https);
-  //listener->run();
-
-  //for (auto index = config.threads - 1; index > 0; --index)
-  //  std::thread([&ioc] { ioc.run(); }).detach();
-  //ioc.run();
-
 	ssor::boss::Server srvr{ config };
 	srvr.run();
 

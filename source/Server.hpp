@@ -154,10 +154,14 @@ struct Server final : public BookService::Service {
 
 		Book book2;
 		book2.set_name("Jane Eyre");
-		book2.set_author("Charlotte Brontë");
+		book2.set_author("Charlotte Bronte");
 
 		m_books.push_back(book1);
 		m_books.push_back(book2);
+	}
+
+	~Server() {
+		m_server->Shutdown();
 	}
 
 	void run() {
@@ -174,14 +178,16 @@ struct Server final : public BookService::Service {
 		m_server->Wait();
 	}
 
-	grpc::Status GetBook(grpc::ServerContext*, const google::protobuf::UInt32Value*, Book* book) override {
-		const auto requested = m_books[0];
-		book->set_name(requested.name());
-		book->set_author(requested.author());
+	grpc::Status GetBook(grpc::ServerContext*,
+	                     const google::protobuf::UInt32Value* request,
+	                     Book* response) override {
+		response = &m_books[request->value()];
 		return grpc::Status::OK;
 	}
 
-	grpc::Status ListBooks(grpc::ServerContext*, const google::protobuf::Empty*, grpc::ServerWriter<Book>* writer) override {
+	grpc::Status ListBooks(grpc::ServerContext*,
+	                       const google::protobuf::Empty*,
+	                       grpc::ServerWriter<Book>* writer) override {
 		for (const auto& b : m_books)
 			writer->Write(b);
 		return grpc::Status::OK;

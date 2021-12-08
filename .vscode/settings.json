@@ -11,7 +11,7 @@
 		"${workspaceFolder}/source",
 		"${workspaceFolder}/.conan/data/abseil/20210324.2/_/_/package/2f5e1942094371586c783746b27e858278020ee5/include",
 		"${workspaceFolder}/.conan/data/boost/1.77.0/_/_/package/110896332970d5a0a0bca697e73d7782d505075e/include",
-		"${workspaceFolder}/.conan/data/grpc/1.39.1/_/_/package/1166c47e93608ab9ed1c0aa159b82c8fdb86000e/include",
+		"${workspaceFolder}/.conan/data/grpc/1.39.1/LeftRuleMatters/stable/package/48992b9c2c80b89c4d5f3001c126cb945bdd9e72/include",
 		"${workspaceFolder}/.conan/data/gtest/1.11.0/_/_/package/c68d7e7df6502c7b8233f9098ebc07f3cdcb9e33/include",
 		"${workspaceFolder}/.conan/data/libxml2/2.9.12/_/_/package/96a8f4d1c2a9166f6cf2f7d7496800ba41b8f84d/include",
 		"${workspaceFolder}/.conan/data/libxml2/2.9.12/_/_/package/96a8f4d1c2a9166f6cf2f7d7496800ba41b8f84d/include/libxml2",
@@ -75,7 +75,7 @@
 		"utility": "cpp"
 	},
 	"files.exclude": {
-		"**/.conan": true,
+		"**/.conan": false,
 		"**/.lldb": true,
 		"**/.git": true,
 		"**/.svn": true,
@@ -83,6 +83,6 @@
 		"**/CVS": true,
 		"**/.DS_Store": true,
 		"**/Thumbs.db": true,
-		"**/build": true,
+		"**/build": false,
 	}
 }

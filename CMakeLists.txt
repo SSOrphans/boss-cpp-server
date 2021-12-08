@@ -5,10 +5,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find all required packages
+enable_testing()
 find_package(Boost 1.77.0 EXACT QUIET MODULE REQUIRED)
 find_package(gRPC 1.39.1 EXACT QUIET MODULE REQUIRED)
+find_package(GTest 1.11.0 EXACT QUIET MODULE REQUIRED)
 find_package(LibXml2 2.9.12 EXACT QUIET MODULE REQUIRED)
 
 add_subdirectory(source)
 # add_subdirectory(benchmarks)
-# add_subdirectory(tests)
+add_subdirectory(tests)

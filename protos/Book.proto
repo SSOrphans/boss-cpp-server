@@ -9,6 +9,16 @@ message Book {
 	string author = 2;
 }
 
+// enum ServiceErrors {
+// 	OK,
+// 	InvalidID
+// }
+
+// message BookResponse {
+// 	optional Book book = 1;
+// 	required ServiceErrors error = 2;
+// }
+
 service BookService {
 	rpc GetBook(google.protobuf.UInt32Value) returns (Book) {}
 	rpc ListBooks(google.protobuf.Empty) returns (stream Book) {}

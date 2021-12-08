@@ -28,6 +28,16 @@
 namespace ssor {
 namespace boss {
 
+// enum ServiceErrors {
+// 	OK,
+// 	InvalidID
+// }
+//
+// message BookResponse {
+// 	optional Book book = 1;
+// 	required ServiceErrors error = 2;
+// }
+//
 class BookService final {
  public:
   static constexpr char const* service_full_name() {

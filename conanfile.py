@@ -11,18 +11,25 @@ class BossCppServerConan(ConanFile):
 		"use_async": [True, False]
 	}
 	default_options = {
-		"use_async": False
+		"use_async": False,
+		"grpc:csharp_plugin": False,
+		"grpc:node_plugin": False,
+		"grpc:objective_c_plugin": False,
+		"grpc:php_plugin": False,
+		"grpc:python_plugin": False,
+		"grpc:ruby_plugin": False
 	}
 	requires = [
+		"benchmark/1.6.0",
 		"boost/1.77.0",
 		"gtest/1.11.0",
-		"grpc/1.39.1",
+		"grpc/1.39.1@LeftRuleMatters/stable",
 		"libxml2/2.9.12",
 		"protobuf/3.17.1",
 		"openssl/3.0.0"
 	]
 	generators = "cmake_find_package"
-
+	
 	def build(self):
 		cmake = CMake(self)
 		cmake.definitions["USE_ASYNC"] = self.options.use_async
